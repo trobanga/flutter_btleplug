@@ -39,10 +39,9 @@ async fn inner_scan(sink: StreamSink<String>) -> Result<()> {
     let mut events = central.events().await.expect("cannot fail");
 
     #[cfg(target_os = "android")]
-    {
-        let vm = JAVAVM.get().unwrap();
-        let _new_env = vm.attach_current_thread().unwrap();
-    }
+    let vm = JAVAVM.get().unwrap();
+    #[cfg(target_os = "android")]
+    let _new_env = vm.attach_current_thread().unwrap();
 
     // start scanning for devices
     sink.add("start scan".to_string());

@@ -86,6 +86,6 @@ pub extern "C" fn JNI_OnLoad(vm: jni::JavaVM, _res: *const std::os::raw::c_void)
     let env = vm.get_env().unwrap();
     jni_utils::init(&env).unwrap();
     btleplug::platform::init(&env).unwrap();
-    JAVAVM.set(vm);
+    let _ = JAVAVM.set(vm);
     jni::JNIVersion::V6.into()
 }
