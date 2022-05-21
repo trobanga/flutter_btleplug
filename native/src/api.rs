@@ -7,7 +7,12 @@ pub fn init(sink: StreamSink<String>) -> Result<()> {
     Ok(())
 }
 
-pub fn ble_scan(sink: StreamSink<String>) -> Result<()> {
-    ble::scan(sink)?;
+pub fn ble_scan(sink: StreamSink<String>, filter: Vec<String>) -> Result<()> {
+    ble::scan(sink, filter)?;
+    Ok(())
+}
+
+pub fn ble_stop_scan() -> Result<()> {
+    ble::stop_scan()?;
     Ok(())
 }

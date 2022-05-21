@@ -12,7 +12,7 @@ void main() {
   final init = api.init();
   init.listen((s) => logger.i(s));
 
-  final scan = api.bleScan();
+  final scan = api.bleScan(filter: []);
   scan.listen((s) => logger.i(s));
   runApp(const MyApp());
 }
