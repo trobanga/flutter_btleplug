@@ -1,72 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:async';
 
 import 'package:logger/logger.dart';
 import 'package:flutter/services.dart';
 import 'package:btleplugtest/btleplugtest.dart';
 
-void main() {
+final streamProvider = StreamProvider.autoDispose<String>((ref) async* {
+  String str = "";
+  final init = api.init();
+  await for (final s in init) {
+    str += s;
+    str += '\n';
+    yield str;
+  }
+});
 
+class ScanNotifier extends StateNotifier<List<String>> {
+  ScanNotifier() : super([]);
+
+  void add(String s) {
+    state = [...state, s];
+  }
+
+  void start() {
+    final scan = api.bleScan(filter: []);
+    scan.listen((s) => add(s));
+  }
+}
+
+final scanProvider =
+    StateNotifierProvider<ScanNotifier, List<String>>((ref) => ScanNotifier());
+
+class Log extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    AsyncValue<String> message = ref.watch(streamProvider);
+
+    return message.when(
+      loading: () => const CircularProgressIndicator(),
+      error: (err, stack) => Text('Error: $err'),
+      data: (message) {
+        return Text(message);
+      },
+    );
+  }
+}
+
+void main() async {
   final logger = Logger();
 
-  final init = api.init();
-  init.listen((s) => logger.i(s));
-
-  final scan = api.bleScan(filter: []);
-  scan.listen((s) => logger.i(s));
-  runApp(const MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+class MyApp extends ConsumerWidget {
   final _btleplugtestPlugin = Btleplugtest();
 
   @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await _btleplugtestPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scans = ref.watch(scanProvider);
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
-      ),
+          appBar: AppBar(
+            title: const Text('Plugin example app'),
+          ),
+          body: Column(children: [
+            ElevatedButton(
+                onPressed: () {
+                  ref.read(scanProvider.notifier).start();
+                },
+                child: const Text('scan')),
+            Log(),
+            ListView(
+              shrinkWrap: true,
+              children: [for (final s in scans) Text(s)],
+            ),
+          ])),
     );
   }
 }
