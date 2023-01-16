@@ -8,6 +8,8 @@ mod ios;
 #[cfg(target_os = "ios")]
 pub use ios::*;
 
+use once_cell::sync::OnceCell;
+use tokio::runtime::Runtime;
 // Dummy functions to silence rust-analyzer
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub static RUNTIME: OnceCell<Runtime> = once_cell::sync::OnceCell::new();
