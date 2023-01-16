@@ -15,8 +15,8 @@ gen:
     cd / && flutter_rust_bridge_codegen {{llvm_path}} \
         --rust-input {{REPO_DIR}}/native/src/api.rs \
         --dart-output {{REPO_DIR}}/lib/bridge_generated.dart \
+        --c-output {{REPO_DIR}}/ios/Classes/BtleplugPlugin.h \
         # --llvm-compiler-opts=-I/usr/lib/clang/14.0.6/include \
-        --c-output {{REPO_DIR}}/ios/Classes/BtleplugPlugin.h
     # --llvm-compiler-opts=-I/usr/lib/clang/version/include
     # cp ios/Runner/bridge_generated.h macos/Runner/bridge_generated.h
 
