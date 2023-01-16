@@ -1,4 +1,4 @@
-# btleplugtest
+# btleplug
 
 A new Flutter plugin project.
 

@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:logger/logger.dart';
 import 'package:flutter/services.dart';
-import 'package:btleplugtest/btleplugtest.dart';
+import 'package:btleplug/btleplug.dart';
 
 final streamProvider = StreamProvider.autoDispose<String>((ref) async* {
   String str = "";
@@ -54,7 +54,7 @@ void main() async {
 }
 
 class MyApp extends ConsumerWidget {
-  final _btleplugtestPlugin = Btleplugtest();
+  final _btleplugPlugin = Btleplug();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

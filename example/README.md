@@ -1,6 +1,6 @@
-# btleplugtest_example
+# btleplug_example
 
-Demonstrates how to use the btleplugtest plugin.
+Demonstrates how to use the btleplug plugin.
 
 ## Getting Started
 

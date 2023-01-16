@@ -1,4 +1,4 @@
-name: btleplugtest
+name: btleplug
 description: A new Flutter plugin project.
 version: 0.0.1
 homepage:
@@ -11,12 +11,14 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
-  flutter_rust_bridge: ^1.29.0
+  flutter_rust_bridge: ^1.61.0
+  ffi: ^2.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  ffigen: ^7.2.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -36,8 +38,8 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.btleplugtest
-        pluginClass: BtleplugtestPlugin
+        package: com.example.btleplug
+        pluginClass: BtleplugPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
