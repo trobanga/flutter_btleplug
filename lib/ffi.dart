@@ -16,7 +16,6 @@ final _dylib =
 
 // The late modifier delays initializing the value until it is actually needed,
 // leaving precious little time for the program to quickly start up.
-final Native api = NativeImpl(
-    io.Platform.isIOS || io.Platform.isMacOS
-        ? DynamicLibrary.executable()
-        : DynamicLibrary.open(_dylib));
+final BtlePlug api = BtlePlugImpl(io.Platform.isIOS || io.Platform.isMacOS
+    ? DynamicLibrary.executable()
+    : DynamicLibrary.open(_dylib));

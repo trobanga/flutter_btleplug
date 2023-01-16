@@ -1,6 +1,6 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-import 'btleplug_method_channel.dart';
+import 'flutter_btleplug_method_channel.dart';
 
 abstract class BtleplugPlatform extends PlatformInterface {
   /// Constructs a BtleplugPlatform.

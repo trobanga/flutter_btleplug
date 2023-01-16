@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'btleplug_platform_interface.dart';
+import 'flutter_btleplug_platform_interface.dart';
 
 /// An implementation of [BtleplugPlatform] that uses method channels.
 class MethodChannelBtleplug extends BtleplugPlatform {
