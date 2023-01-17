@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'dart:async';
 
 import 'package:logger/logger.dart';
-import 'package:flutter/services.dart';
 import 'package:btleplug/btleplug.dart';
 
 final streamProvider = StreamProvider.autoDispose<String>((ref) async* {

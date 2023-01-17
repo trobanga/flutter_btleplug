@@ -14,7 +14,7 @@ abstract class BtleplugPlatform extends PlatformInterface {
   ///
   /// Defaults to [MethodChannelBtleplug].
   static BtleplugPlatform get instance => _instance;
-  
+
   /// Platform-specific implementations should set this with their own
   /// platform-specific class that extends [BtleplugPlatform] when
   /// they register themselves.
