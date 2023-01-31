@@ -3,17 +3,38 @@ mod android;
 #[cfg(target_os = "android")]
 pub use android::*;
 
-#[cfg(target_os = "ios")]
-mod ios;
-#[cfg(target_os = "ios")]
-pub use ios::*;
+#[cfg(any(
+    target_os = "ios",
+    target_os = "windows",
+    target_os = "macos",
+    target_os = "linux"
+))]
+mod general;
+#[cfg(any(
+    target_os = "ios",
+    target_os = "windows",
+    target_os = "macos",
+    target_os = "linux"
+))]
+pub use general::*;
 
-use once_cell::sync::OnceCell;
-use tokio::runtime::Runtime;
 // Dummy functions to silence rust-analyzer
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
-pub static RUNTIME: OnceCell<Runtime> = once_cell::sync::OnceCell::new();
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[cfg(not(any(
+    target_os = "android",
+    target_os = "ios",
+    target_os = "windows",
+    target_os = "macos",
+    target_os = "linux"
+)))]
+pub static RUNTIME: once_cell::sync::OnceCell<tokio::runtime::Runtime> =
+    once_cell::sync::OnceCell::new();
+#[cfg(not(any(
+    target_os = "android",
+    target_os = "ios",
+    target_os = "windows",
+    target_os = "macos",
+    target_os = "linux"
+)))]
 pub fn create_runtime(sink: flutter_rust_bridge::StreamSink<String>) -> Result<(), super::Error> {
     Ok(())
 }
