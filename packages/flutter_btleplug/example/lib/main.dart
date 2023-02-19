@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,18 +7,12 @@ import 'package:flutter_btleplug/flutter_btleplug.dart';
 final streamProvider = StreamProvider.autoDispose<String>((ref) async* {
   String str = "";
 
-  print('call init');
-  try {
-    final init = btl.init();
+  final init = btl.init();
 
-    await for (final s in init) {
-      str += s;
-      str += '\n';
-      yield str;
-    }
-  } catch (e) {
-    print(e);
-    exit(1);
+  await for (final s in init) {
+    str += s;
+    str += '\n';
+    yield str;
   }
 });
 
@@ -41,6 +33,8 @@ final scanProvider =
     StateNotifierProvider<ScanNotifier, List<String>>((ref) => ScanNotifier());
 
 class Log extends ConsumerWidget {
+  const Log({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     AsyncValue<String> message = ref.watch(streamProvider);
@@ -56,13 +50,13 @@ class Log extends ConsumerWidget {
 }
 
 void main() async {
-  final logger = Logger();
+  Logger();
 
-  runApp(ProviderScope(child: MyApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-
 class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -78,7 +72,7 @@ class MyApp extends ConsumerWidget {
                   ref.read(scanProvider.notifier).start();
                 },
                 child: const Text('scan')),
-            Log(),
+            const Log(),
             ListView(
               shrinkWrap: true,
               children: [for (final s in scans) Text(s)],

@@ -67,11 +67,11 @@ class BtleplugWire implements FlutterRustBridgeWireBase {
 
   int JNI_OnLoad(
     int vm,
-    ffi.Pointer<ffi.Void> _res,
+    ffi.Pointer<ffi.Void> res,
   ) {
     return _JNI_OnLoad(
       vm,
-      _res,
+      res,
     );
   }
 

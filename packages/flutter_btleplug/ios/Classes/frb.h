@@ -21,7 +21,7 @@ typedef struct wire_StringList {
 
 typedef struct DartCObject *WireSyncReturn;
 
-jint JNI_OnLoad(JavaVM vm, const void *_res);
+jint JNI_OnLoad(JavaVM vm, const void *res);
 
 void store_dart_post_cobject(DartPostCObjectFnType ptr);
 

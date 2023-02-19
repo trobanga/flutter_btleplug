@@ -99,7 +99,8 @@ fn setup_class_loader(env: &JNIEnv) -> Result<(), Error> {
 }
 
 #[no_mangle]
-pub extern "C" fn JNI_OnLoad(vm: jni::JavaVM, _res: *const std::os::raw::c_void) -> jni::sys::jint {
+pub extern "C" fn JNI_OnLoad(vm: jni::JavaVM, res: *const std::os::raw::c_void) -> jni::sys::jint {
+    let _res = res;
     let env = vm.get_env().unwrap();
     jni_utils::init(&env).unwrap();
     btleplug::platform::init(&env).unwrap();
