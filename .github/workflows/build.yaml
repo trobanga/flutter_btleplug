@@ -4,10 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - melos
-  schedule:
-    # runs the CI everyday at 10AM
-    - cron: "0 10 * * *"
+      - main
 
 jobs:
   # General build, check, and test steps
