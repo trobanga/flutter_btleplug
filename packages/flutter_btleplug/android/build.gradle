@@ -1,0 +1,61 @@
+// The Android Gradle Plugin builds the native code with the Android NDK.
+
+group 'com.eigenbeat.btleplug.flutter.flutter_btleplug'
+version '1.0'
+
+buildscript {
+    ext.kotlin_version = '1.6.10'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        // The Android Gradle Plugin knows how to build native code with the NDK.
+        classpath 'com.android.tools.build:gradle:7.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 31
+
+    defaultConfig {
+        minSdkVersion 16
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    // Trigger the binary download/update over in CMakeLists.txt
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation(name: 'droidplug', version: '+', ext: 'aar')
+}

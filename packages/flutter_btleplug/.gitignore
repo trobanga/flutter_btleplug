@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+migrate_working_dir/
 
 # IntelliJ related
 *.iml
@@ -21,18 +22,9 @@
 #.vscode/
 
 # Flutter/Dart/Pub related
-pubspec.lock
-pubspec_overrides.yaml
+# Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
+/pubspec.lock
 **/doc/api/
 .dart_tool/
 .packages
 build/
-.pub-cache/
-.pub/
-.flutter-plugins
-.flutter-plugins-dependencies
-
-# Rust related
-/target/
-/Cargo.lock
-/platform-build
