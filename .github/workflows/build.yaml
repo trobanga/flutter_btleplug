@@ -24,7 +24,7 @@ jobs:
       # Rust
       - name: Check Rust format
         working-directory: ./packages/btleplug/native/src
-        run: rustfmt --check lib.rs
+        run: rustfmt --edition 2021 --check lib.rs
       - name: Rust code analysis
         run: cargo clippy -- -D warnings
       - name: Run Rust tests
