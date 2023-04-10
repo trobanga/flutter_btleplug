@@ -2,10 +2,6 @@ name: btleplug
 
 repository: https://github.com/trobanga/flutter_btleplug
 
-command:
-  bootstrap:
-    usePubspecOverrides: true
-
 packages:
   - packages/**
 
