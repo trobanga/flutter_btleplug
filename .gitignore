@@ -21,7 +21,6 @@
 #.vscode/
 
 # Flutter/Dart/Pub related
-pubspec.lock
 pubspec_overrides.yaml
 **/doc/api/
 .dart_tool/
