@@ -1,76 +1,73 @@
-use flutter_rust_bridge::StreamSink;
 use jni::objects::GlobalRef;
 use jni::{AttachGuard, JNIEnv, JavaVM};
 use once_cell::sync::OnceCell;
 use std::cell::RefCell;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use tokio::runtime::Runtime;
 
 use crate::ble::Error;
+use crate::logger::log;
+
+use super::RUNTIME;
 
 static CLASS_LOADER: OnceCell<GlobalRef> = OnceCell::new();
 pub static JAVAVM: OnceCell<JavaVM> = OnceCell::new();
-pub static RUNTIME: OnceCell<Runtime> = OnceCell::new();
 
 std::thread_local! {
     static JNI_ENV: RefCell<Option<AttachGuard<'static>>> = RefCell::new(None);
 }
 
-pub fn create_runtime(sink: StreamSink<String>) -> Result<(), Error> {
-    sink.add("CREATE RUNTIME".to_owned());
+pub fn create_runtime() -> Result<(), Error> {
+    log("CREATE RUNTIME".to_owned());
     let vm = JAVAVM.get().ok_or(Error::JavaVM)?;
     let env = vm.attach_current_thread().unwrap();
 
-    setup_class_loader(&env);
-    let sink_clone = sink.clone();
-    let runtime = {
-        tokio::runtime::Builder::new_multi_thread()
-            .enable_all()
-            .thread_name_fn(|| {
-                static ATOMIC_ID: AtomicUsize = AtomicUsize::new(0);
-                let id = ATOMIC_ID.fetch_add(1, Ordering::SeqCst);
-                format!("intiface-thread-{}", id)
-            })
-            .on_thread_stop(move || {
-                sink_clone.add("STOPPING THREAD".to_owned());
-                JNI_ENV.with(|f| *f.borrow_mut() = None);
-            })
-            .on_thread_start(move || {
-                sink.add("WRAPPING NEW THREAD IN VM".to_string());
+    setup_class_loader(&env)?;
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .thread_name_fn(|| {
+            static ATOMIC_ID: AtomicUsize = AtomicUsize::new(0);
+            let id = ATOMIC_ID.fetch_add(1, Ordering::SeqCst);
+            format!("intiface-thread-{}", id)
+        })
+        .on_thread_stop(move || {
+            log("STOPPING THREAD");
+            JNI_ENV.with(|f| *f.borrow_mut() = None);
+        })
+        .on_thread_start(move || {
+            log("WRAPPING NEW THREAD IN VM");
 
-                // We now need to call the following code block via JNI calls. God help us.
-                //
-                //  java.lang.Thread.currentThread().setContextClassLoader(
-                //    java.lang.ClassLoader.getSystemClassLoader()
-                //  );
-                sink.add("Adding classloader to thread".to_string());
+            // We now need to call the following code block via JNI calls. God help us.
+            //
+            //  java.lang.Thread.currentThread().setContextClassLoader(
+            //    java.lang.ClassLoader.getSystemClassLoader()
+            //  );
+            log("Adding classloader to thread");
 
-                let vm = JAVAVM.get().unwrap();
-                let env = vm.attach_current_thread().unwrap();
+            let vm = JAVAVM.get().unwrap();
+            let env = vm.attach_current_thread().unwrap();
 
-                let thread = env
-                    .call_static_method(
-                        "java/lang/Thread",
-                        "currentThread",
-                        "()Ljava/lang/Thread;",
-                        &[],
-                    )
-                    .unwrap()
-                    .l()
-                    .unwrap();
-                env.call_method(
-                    thread,
-                    "setContextClassLoader",
-                    "(Ljava/lang/ClassLoader;)V",
-                    &[CLASS_LOADER.get().unwrap().as_obj().into()],
+            let thread = env
+                .call_static_method(
+                    "java/lang/Thread",
+                    "currentThread",
+                    "()Ljava/lang/Thread;",
+                    &[],
                 )
+                .unwrap()
+                .l()
                 .unwrap();
-                sink.add("Classloader added to thread".to_string());
-                JNI_ENV.with(|f| *f.borrow_mut() = Some(env));
-            })
-            .build()
-            .unwrap()
-    };
+            env.call_method(
+                thread,
+                "setContextClassLoader",
+                "(Ljava/lang/ClassLoader;)V",
+                &[CLASS_LOADER.get().unwrap().as_obj().into()],
+            )
+            .unwrap();
+            log("Classloader added to thread");
+            JNI_ENV.with(|f| *f.borrow_mut() = Some(env));
+        })
+        .build()
+        .unwrap();
     RUNTIME.set(runtime).map_err(|_| Error::Runtime)?;
     Ok(())
 }

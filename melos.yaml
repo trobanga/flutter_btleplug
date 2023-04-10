@@ -38,6 +38,10 @@ scripts:
     run: bash scripts/build-android.sh
     description: Build the .tar.gz for Android.
 
+  build:android-dev:
+    run: bash scripts/build-android-dev.sh
+    description: Build the .tar.gz for Android.
+
   build:linux:
     run: bash scripts/build-linux.sh
     description: Build the .tar.gz for Linux.
@@ -63,3 +67,7 @@ scripts:
     select-package:
       flutter: true
       dir-exists: test
+
+
+  clean:
+    run: cargo clean && cd packages/flutter_btleplug && flutter clean

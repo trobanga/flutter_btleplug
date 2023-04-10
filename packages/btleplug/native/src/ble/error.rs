@@ -8,12 +8,24 @@ pub enum Error {
     #[error("JNI {0}")]
     Jni(#[from] jni::errors::Error),
 
+    #[error("Call init() first.")]
+    RuntimeNotInitialized,
+
+    #[allow(dead_code)]
     #[error("Cannot initialize CLASS_LOADER")]
     ClassLoader,
 
+    #[allow(dead_code)]
     #[error("Cannot initialize RUNTIME")]
     Runtime,
 
+    #[allow(dead_code)]
     #[error("Java vm not initialized")]
     JavaVM,
+
+    #[error("TX is already set.")]
+    TxAlreadySet,
+
+    #[error("TX is not initialized.")]
+    TxNotInitialized,
 }

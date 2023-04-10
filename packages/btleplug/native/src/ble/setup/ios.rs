@@ -2,7 +2,7 @@ use crate::ble::Error;
 
 pub static RUNTIME: OnceCell<Runtime> = OnceCell::new();
 
-pub fn create_runtime(sink: StreamSink<String>) -> Result<(), Error> {
+pub fn create_runtime() -> Result<(), Error> {
     let runtime = {
         tokio::runtime::Builder::new_multi_thread()
             .enable_all()

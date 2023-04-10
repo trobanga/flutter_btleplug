@@ -4,15 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_btleplug/flutter_btleplug.dart';
 
+final log = Logger();
+
 final streamProvider = StreamProvider.autoDispose<String>((ref) async* {
-  String str = "";
-
-  final init = btl.init();
-
-  await for (final s in init) {
-    str += s;
-    str += '\n';
-    yield str;
+  await for (final s in btl.createLogStream()) {
+    log.i(s.msg);
   }
 });
 
@@ -25,7 +21,10 @@ class ScanNotifier extends StateNotifier<List<String>> {
 
   void start() {
     final scan = btl.bleScan(filter: []);
-    scan.listen((s) => add(s));
+    scan.listen((s) {
+      log.i(s.id);
+      add(s.id);
+    });
   }
 }
 
@@ -50,8 +49,7 @@ class Log extends ConsumerWidget {
 }
 
 void main() async {
-  Logger();
-
+  final init = btl.init();
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -69,6 +67,7 @@ class MyApp extends ConsumerWidget {
           body: Column(children: [
             ElevatedButton(
                 onPressed: () {
+                  log.i('scanning...');
                   ref.read(scanProvider.notifier).start();
                 },
                 child: const Text('scan')),

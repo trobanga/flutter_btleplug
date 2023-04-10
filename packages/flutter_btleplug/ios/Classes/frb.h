@@ -39,6 +39,8 @@ void wire_ble_scan(int64_t port_, struct wire_StringList *filter);
 
 void wire_ble_stop_scan(int64_t port_);
 
+void wire_create_log_stream(int64_t port_);
+
 struct wire_StringList *new_StringList_0(int32_t len);
 
 struct wire_uint_8_list *new_uint_8_list_0(int32_t len);
@@ -50,6 +52,7 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     dummy_var ^= ((int64_t) (void*) wire_init);
     dummy_var ^= ((int64_t) (void*) wire_ble_scan);
     dummy_var ^= ((int64_t) (void*) wire_ble_stop_scan);
+    dummy_var ^= ((int64_t) (void*) wire_create_log_stream);
     dummy_var ^= ((int64_t) (void*) new_StringList_0);
     dummy_var ^= ((int64_t) (void*) new_uint_8_list_0);
     dummy_var ^= ((int64_t) (void*) free_WireSyncReturn);
