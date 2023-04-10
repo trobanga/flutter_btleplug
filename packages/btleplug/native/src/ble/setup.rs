@@ -18,7 +18,7 @@ pub fn create_runtime() -> Result<(), super::Error> {
 
     use crate::logger::log;
 
-    log("Create runtime".to_owned());
+    log("Create runtime");
 
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()

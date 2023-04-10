@@ -49,7 +49,7 @@ class Log extends ConsumerWidget {
 }
 
 void main() async {
-  final init = btl.init();
+  btl.init();
   runApp(const ProviderScope(child: MyApp()));
 }
 
