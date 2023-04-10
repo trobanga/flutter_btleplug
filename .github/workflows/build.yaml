@@ -21,6 +21,8 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
 
+      - name: Install dependencies
+        run: apt install libdbus-1-dev pkg-config
       # Rust
       - name: Check Rust format
         working-directory: ./packages/btleplug/native/src
