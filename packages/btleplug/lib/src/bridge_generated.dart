@@ -21,6 +21,16 @@ abstract class Btleplug {
 
   FlutterRustBridgeTaskConstMeta get kInitConstMeta;
 
+  /// Scan for Bluetooth Low Energy devices and send the results through the given sink.
+  ///
+  /// # Parameters
+  ///
+  /// * `sink` - A stream sink that new discovered devices will be passed through.
+  /// * `filter` - A list of filter strings to apply to the scan result.
+  ///
+  /// # Return
+  ///
+  /// Returns a `Result<()>` indicating if the scan operation has successfully started.
   Stream<BleDevice> bleScan({required List<String> filter, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kBleScanConstMeta;
