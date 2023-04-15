@@ -60,6 +60,19 @@ fn wire_connect_impl(port_: MessagePort, id: impl Wire2Api<String> + UnwindSafe)
         },
     )
 }
+fn wire_disconnect_impl(port_: MessagePort, id: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "disconnect",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_id = id.wire2api();
+            move |task_callback| disconnect(api_id)
+        },
+    )
+}
 fn wire_create_log_stream_impl(port_: MessagePort) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
@@ -143,6 +156,11 @@ mod web {
     }
 
     #[wasm_bindgen]
+    pub fn wire_disconnect(port_: MessagePort, id: String) {
+        wire_disconnect_impl(port_, id)
+    }
+
+    #[wasm_bindgen]
     pub fn wire_create_log_stream(port_: MessagePort) {
         wire_create_log_stream_impl(port_)
     }
@@ -212,6 +230,11 @@ mod io {
     #[no_mangle]
     pub extern "C" fn wire_connect(port_: i64, id: *mut wire_uint_8_list) {
         wire_connect_impl(port_, id)
+    }
+
+    #[no_mangle]
+    pub extern "C" fn wire_disconnect(port_: i64, id: *mut wire_uint_8_list) {
+        wire_disconnect_impl(port_, id)
     }
 
     #[no_mangle]

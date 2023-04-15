@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 
 use anyhow::Result;
-use btleplug::api::Peripheral as _;
-use btleplug::api::{bleuuid::BleUuid, Central, CentralEvent, Manager as _, ScanFilter};
+use btleplug::api::{
+    bleuuid::BleUuid, Central, CentralEvent, Manager as _, Peripheral as _, ScanFilter,
+};
 use btleplug::platform::{Manager, PeripheralId};
 use flutter_rust_bridge::StreamSink;
 use futures::stream::StreamExt;
@@ -25,6 +26,9 @@ enum Command {
     Connect {
         id: String,
     },
+    Disconnect {
+        id: String,
+    },
 }
 
 impl std::fmt::Debug for Command {
@@ -39,9 +43,18 @@ impl std::fmt::Debug for Command {
 struct Peripheral {
     peripheral: btleplug::platform::Peripheral,
     last_seen: time::Instant,
+    is_connected: bool,
 }
 
 impl Peripheral {
+    fn new(peripheral: btleplug::platform::Peripheral) -> Self {
+        Self {
+            peripheral,
+            last_seen: time::Instant::now(),
+            is_connected: false,
+        }
+    }
+
     fn id(&self) -> PeripheralId {
         self.peripheral.id()
     }
@@ -53,10 +66,23 @@ impl Peripheral {
             None
         }
     }
+
+    async fn connect(&self) -> Result<()> {
+        self.peripheral.connect().await?;
+        Ok(())
+    }
+
+    async fn disconnect(&self) -> Result<()> {
+        self.peripheral.disconnect().await?;
+        Ok(())
+    }
+
+    fn is_connected(&self) -> bool {
+        self.is_connected
+    }
 }
 
-static DEVICES: Lazy<Mutex<HashMap<PeripheralId, Peripheral>>> =
-    Lazy::new(|| Mutex::new(HashMap::new()));
+static DEVICES: Lazy<Mutex<HashMap<String, Peripheral>>> = Lazy::new(|| Mutex::new(HashMap::new()));
 
 static TX: OnceCell<mpsc::UnboundedSender<Command>> = OnceCell::new();
 
@@ -79,8 +105,11 @@ pub fn init() -> Result<()> {
     runtime.spawn(async move {
         while let Some(msg) = rx.recv().await {
             match msg {
-                Command::Scan { sink, filter } => inner_scan(sink, filter).await.unwrap(),
+                Command::Scan { sink, filter } => {
+                    tokio::spawn(async { inner_scan(sink, filter).await.unwrap() });
+                }
                 Command::Connect { id } => inner_connect(id).await.unwrap(),
+                Command::Disconnect { id } => inner_disconnect(id).await.unwrap(),
             }
         }
     });
@@ -103,7 +132,7 @@ pub fn init() -> Result<()> {
 /// ```
 async fn remove_stale_devices(timeout: u64) {
     let mut devices = DEVICES.lock().await;
-    devices.retain(|_, d| d.last_seen.elapsed().as_secs() < timeout);
+    devices.retain(|_, d| d.is_connected() || d.last_seen.elapsed().as_secs() < timeout);
 }
 
 /// This is the BleDevice intended to show in Dart/Flutter
@@ -180,26 +209,30 @@ async fn inner_scan(sink: StreamSink<Vec<BleDevice>>, _filter: Vec<String>) -> R
                 match event {
                     CentralEvent::DeviceDiscovered(id) => {
                         log(format!("DeviceDiscovered: {:?}", &id));
-                        let last_seen = time::Instant::now();
                         let peripheral = central.peripheral(&id).await?;
-                        let peripheral = Peripheral {
-                            peripheral,
-                            last_seen,
-                        };
+                        let peripheral = Peripheral::new(peripheral);
                         let mut devices = DEVICES.lock().await;
-                        devices.insert(id, peripheral);
+                        devices.insert(id.to_string(), peripheral);
                     }
                     CentralEvent::DeviceUpdated(id) => {
                         let mut devices = DEVICES.lock().await;
-                        if let Some(device) = devices.get_mut(&id) {
+                        if let Some(device) = devices.get_mut(&id.to_string()) {
                             device.last_seen = time::Instant::now();
                         }
                     }
                     CentralEvent::DeviceConnected(id) => {
-                        // log(format!("DeviceConnected: {:?}", id));
+                        log(format!("DeviceConnected: {:?}", id));
+                        let mut devices = DEVICES.lock().await;
+                        if let Some(device) = devices.get_mut(&id.to_string()) {
+                            device.is_connected = true;
+                        }
                     }
                     CentralEvent::DeviceDisconnected(id) => {
-                        // log(format!("DeviceDisconnected: {:?}", id));
+                        log(format!("DeviceDisconnected: {:?}", id));
+                        let mut devices = DEVICES.lock().await;
+                        if let Some(device) = devices.get_mut(&id.to_string()) {
+                            device.is_connected = false;
+                        }
                     }
                     CentralEvent::ManufacturerDataAdvertisement {
                         id,
@@ -230,9 +263,24 @@ async fn inner_scan(sink: StreamSink<Vec<BleDevice>>, _filter: Vec<String>) -> R
 }
 
 pub fn connect(id: String) -> Result<()> {
+    log(format!("Try to connect to: {id}"));
     send(Command::Connect { id })
 }
 
 async fn inner_connect(id: String) -> Result<()> {
-    Ok(())
+    log(format!("Try to connect to: {id}"));
+    let devices = DEVICES.lock().await;
+    let device = devices.get(&id).ok_or(Error::UnknownPeripheral(id))?;
+    device.connect().await
+}
+
+pub fn disconnect(id: String) -> Result<()> {
+    send(Command::Disconnect { id })
+}
+
+async fn inner_disconnect(id: String) -> Result<()> {
+    log(format!("Try to disconnect from: {id}"));
+    let devices = DEVICES.lock().await;
+    let device = devices.get(&id).ok_or(Error::UnknownPeripheral(id))?;
+    device.disconnect().await
 }

@@ -40,6 +40,10 @@ pub fn connect(id: String) -> Result<()> {
     ble::connect(id)
 }
 
+pub fn disconnect(id: String) -> Result<()> {
+    ble::disconnect(id)
+}
+
 #[frb(mirror(LogEntry))]
 struct _LogEntry {
     time_millis: u64,

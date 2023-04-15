@@ -28,4 +28,7 @@ pub enum Error {
 
     #[error("TX is not initialized.")]
     TxNotInitialized,
+
+    #[error("There is no peripheral with id: {0}")]
+    UnknownPeripheral(String),
 }

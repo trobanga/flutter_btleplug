@@ -48,6 +48,10 @@ abstract class Btleplug {
 
   FlutterRustBridgeTaskConstMeta get kConnectConstMeta;
 
+  Future<void> disconnect({required String id, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kDisconnectConstMeta;
+
   Stream<LogEntry> createLogStream({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kCreateLogStreamConstMeta;
@@ -130,6 +134,23 @@ class BtleplugImpl implements Btleplug {
   FlutterRustBridgeTaskConstMeta get kConnectConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
         debugName: "connect",
+        argNames: ["id"],
+      );
+
+  Future<void> disconnect({required String id, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(id);
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_disconnect(port_, arg0),
+      parseSuccessData: _wire2api_unit,
+      constMeta: kDisconnectConstMeta,
+      argValues: [id],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kDisconnectConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "disconnect",
         argNames: ["id"],
       );
 

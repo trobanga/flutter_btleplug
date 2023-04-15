@@ -18,13 +18,13 @@ class ScanNotifier extends StateNotifier<List<BleDevice>> {
   void start() {
     final scan = btl.scan(filter: []);
     scan.listen((s) {
-        state = s;
+      state = s;
     });
   }
 }
 
-final scanProvider =
-    StateNotifierProvider<ScanNotifier, List<BleDevice>>((ref) => ScanNotifier());
+final scanProvider = StateNotifierProvider<ScanNotifier, List<BleDevice>>(
+    (ref) => ScanNotifier());
 
 class Log extends ConsumerWidget {
   const Log({super.key});
@@ -69,7 +69,15 @@ class MyApp extends ConsumerWidget {
             const Log(),
             ListView(
               shrinkWrap: true,
-              children: [for (final s in scans) ElevatedButton(onPressed: () {btl.connect(s.id)}, child: Text(s.name))],
+              children: [
+                for (final s in scans)
+                  ElevatedButton(
+                      onPressed: () {
+                        log.i('connect to ${s.id}');
+                        btl.connect(id: s.id);
+                      },
+                      child: Text(s.name))
+              ],
             ),
           ])),
     );

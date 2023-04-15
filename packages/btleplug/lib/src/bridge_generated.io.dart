@@ -199,6 +199,23 @@ class BtleplugWire implements FlutterRustBridgeWireBase {
   late final _wire_connect = _wire_connectPtr
       .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
+  void wire_disconnect(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> id,
+  ) {
+    return _wire_disconnect(
+      port_,
+      id,
+    );
+  }
+
+  late final _wire_disconnectPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_disconnect');
+  late final _wire_disconnect = _wire_disconnectPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
   void wire_create_log_stream(
     int port_,
   ) {
