@@ -3,43 +3,55 @@
 #include <stdlib.h>
 typedef struct _Dart_Handle* Dart_Handle;
 
-#define PERIPHERALSTATE_CONNECTED 2
+typedef struct DartCObject DartCObject;
 
-#define CHARACTERISTICPROPERTY_BROADCAST 1
+typedef int64_t DartPort;
 
-#define CHARACTERISTICPROPERTY_READ 2
+typedef bool (*DartPostCObjectFnType)(DartPort port_id, void *message);
 
-#define CHARACTERISTICPROPERTY_WRITEWITHOUTRESPONSE 4
+typedef struct wire_uint_8_list {
+  uint8_t *ptr;
+  int32_t len;
+} wire_uint_8_list;
 
-#define CHARACTERISTICPROPERTY_WRITE 8
+typedef struct wire_StringList {
+  struct wire_uint_8_list **ptr;
+  int32_t len;
+} wire_StringList;
 
-#define CHARACTERISTICPROPERTY_NOTIFY 16
+typedef struct DartCObject *WireSyncReturn;
 
-#define CHARACTERISTICPROPERTY_INDICATE 32
+jint JNI_OnLoad(JavaVM vm, const void *res);
 
-#define CHARACTERISTICPROPERTY_AUTHENTICATEDSIGNEDWRITES 64
+void store_dart_post_cobject(DartPostCObjectFnType ptr);
 
-#define SERVICE_DATA_16_BIT_UUID 22
+Dart_Handle get_dart_object(uintptr_t ptr);
 
-#define SERVICE_DATA_32_BIT_UUID 32
+void drop_dart_object(uintptr_t ptr);
 
-#define SERVICE_DATA_128_BIT_UUID 33
+uintptr_t new_dart_opaque(Dart_Handle handle);
 
-typedef struct dispatch_object_s dispatch_object_s;
+intptr_t init_frb_dart_api_dl(void *obj);
 
-typedef struct dispatch_object_s *dispatch_queue_t;
+void wire_init(int64_t port_);
 
-typedef const struct dispatch_object_s *dispatch_queue_attr_t;
+void wire_scan(int64_t port_, struct wire_StringList *filter);
 
-#define DISPATCH_QUEUE_SERIAL (dispatch_queue_attr_t)0
+void wire_connect(int64_t port_, struct wire_uint_8_list *id);
 
-extern dispatch_queue_t dispatch_queue_create(const char *label, dispatch_queue_attr_t attr);
+void wire_create_log_stream(int64_t port_);
+
+struct wire_StringList *new_StringList_0(int32_t len);
+
+struct wire_uint_8_list *new_uint_8_list_0(int32_t len);
+
+void free_WireSyncReturn(WireSyncReturn ptr);
 
 static int64_t dummy_method_to_enforce_bundling(void) {
     int64_t dummy_var = 0;
     dummy_var ^= ((int64_t) (void*) wire_init);
-    dummy_var ^= ((int64_t) (void*) wire_ble_scan);
-    dummy_var ^= ((int64_t) (void*) wire_ble_stop_scan);
+    dummy_var ^= ((int64_t) (void*) wire_scan);
+    dummy_var ^= ((int64_t) (void*) wire_connect);
     dummy_var ^= ((int64_t) (void*) wire_create_log_stream);
     dummy_var ^= ((int64_t) (void*) new_StringList_0);
     dummy_var ^= ((int64_t) (void*) new_uint_8_list_0);

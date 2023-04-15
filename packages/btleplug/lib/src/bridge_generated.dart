@@ -22,6 +22,7 @@ abstract class Btleplug {
   FlutterRustBridgeTaskConstMeta get kInitConstMeta;
 
   /// Scan for Bluetooth Low Energy devices and send the results through the given sink.
+  /// In Dart/Flutter one can listen() to bleScan(). The scan is automatically stopped when the subscription is cancelled.
   ///
   /// # Parameters
   ///
@@ -31,19 +32,28 @@ abstract class Btleplug {
   /// # Return
   ///
   /// Returns a `Result<()>` indicating if the scan operation has successfully started.
-  Stream<BleDevice> bleScan({required List<String> filter, dynamic hint});
+  ///
+  /// # Dart/Flutter Example
+  /// ```dart
+  /// final scan = bleScan().await;
+  /// scan.listen((devices) {
+  /// ...
+  /// })
+  /// ```
+  Stream<List<BleDevice>> scan({required List<String> filter, dynamic hint});
 
-  FlutterRustBridgeTaskConstMeta get kBleScanConstMeta;
+  FlutterRustBridgeTaskConstMeta get kScanConstMeta;
 
-  Future<void> bleStopScan({dynamic hint});
+  Future<void> connect({required String id, dynamic hint});
 
-  FlutterRustBridgeTaskConstMeta get kBleStopScanConstMeta;
+  FlutterRustBridgeTaskConstMeta get kConnectConstMeta;
 
   Stream<LogEntry> createLogStream({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kCreateLogStreamConstMeta;
 }
 
+/// This is the BleDevice intended to show in Dart/Flutter
 class BleDevice {
   final String id;
   final String name;
@@ -89,37 +99,38 @@ class BtleplugImpl implements Btleplug {
         argNames: [],
       );
 
-  Stream<BleDevice> bleScan({required List<String> filter, dynamic hint}) {
+  Stream<List<BleDevice>> scan({required List<String> filter, dynamic hint}) {
     var arg0 = _platform.api2wire_StringList(filter);
     return _platform.executeStream(FlutterRustBridgeTask(
-      callFfi: (port_) => _platform.inner.wire_ble_scan(port_, arg0),
-      parseSuccessData: _wire2api_ble_device,
-      constMeta: kBleScanConstMeta,
+      callFfi: (port_) => _platform.inner.wire_scan(port_, arg0),
+      parseSuccessData: _wire2api_list_ble_device,
+      constMeta: kScanConstMeta,
       argValues: [filter],
       hint: hint,
     ));
   }
 
-  FlutterRustBridgeTaskConstMeta get kBleScanConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kScanConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "ble_scan",
+        debugName: "scan",
         argNames: ["filter"],
       );
 
-  Future<void> bleStopScan({dynamic hint}) {
+  Future<void> connect({required String id, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(id);
     return _platform.executeNormal(FlutterRustBridgeTask(
-      callFfi: (port_) => _platform.inner.wire_ble_stop_scan(port_),
+      callFfi: (port_) => _platform.inner.wire_connect(port_, arg0),
       parseSuccessData: _wire2api_unit,
-      constMeta: kBleStopScanConstMeta,
-      argValues: [],
+      constMeta: kConnectConstMeta,
+      argValues: [id],
       hint: hint,
     ));
   }
 
-  FlutterRustBridgeTaskConstMeta get kBleStopScanConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kConnectConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "ble_stop_scan",
-        argNames: [],
+        debugName: "connect",
+        argNames: ["id"],
       );
 
   Stream<LogEntry> createLogStream({dynamic hint}) {
@@ -159,6 +170,10 @@ class BtleplugImpl implements Btleplug {
 
   int _wire2api_i64(dynamic raw) {
     return castInt(raw);
+  }
+
+  List<BleDevice> _wire2api_list_ble_device(dynamic raw) {
+    return (raw as List<dynamic>).map(_wire2api_ble_device).toList();
   }
 
   LogEntry _wire2api_log_entry(dynamic raw) {

@@ -34,27 +34,30 @@ fn wire_init_impl(port_: MessagePort) {
         move || move |task_callback| init(),
     )
 }
-fn wire_ble_scan_impl(port_: MessagePort, filter: impl Wire2Api<Vec<String>> + UnwindSafe) {
+fn wire_scan_impl(port_: MessagePort, filter: impl Wire2Api<Vec<String>> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
-            debug_name: "ble_scan",
+            debug_name: "scan",
             port: Some(port_),
             mode: FfiCallMode::Stream,
         },
         move || {
             let api_filter = filter.wire2api();
-            move |task_callback| ble_scan(task_callback.stream_sink(), api_filter)
+            move |task_callback| scan(task_callback.stream_sink(), api_filter)
         },
     )
 }
-fn wire_ble_stop_scan_impl(port_: MessagePort) {
+fn wire_connect_impl(port_: MessagePort, id: impl Wire2Api<String> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
-            debug_name: "ble_stop_scan",
+            debug_name: "connect",
             port: Some(port_),
             mode: FfiCallMode::Normal,
         },
-        move || move |task_callback| ble_stop_scan(),
+        move || {
+            let api_id = id.wire2api();
+            move |task_callback| connect(api_id)
+        },
     )
 }
 fn wire_create_log_stream_impl(port_: MessagePort) {
@@ -130,13 +133,13 @@ mod web {
     }
 
     #[wasm_bindgen]
-    pub fn wire_ble_scan(port_: MessagePort, filter: JsValue) {
-        wire_ble_scan_impl(port_, filter)
+    pub fn wire_scan(port_: MessagePort, filter: JsValue) {
+        wire_scan_impl(port_, filter)
     }
 
     #[wasm_bindgen]
-    pub fn wire_ble_stop_scan(port_: MessagePort) {
-        wire_ble_stop_scan_impl(port_)
+    pub fn wire_connect(port_: MessagePort, id: String) {
+        wire_connect_impl(port_, id)
     }
 
     #[wasm_bindgen]
@@ -202,13 +205,13 @@ mod io {
     }
 
     #[no_mangle]
-    pub extern "C" fn wire_ble_scan(port_: i64, filter: *mut wire_StringList) {
-        wire_ble_scan_impl(port_, filter)
+    pub extern "C" fn wire_scan(port_: i64, filter: *mut wire_StringList) {
+        wire_scan_impl(port_, filter)
     }
 
     #[no_mangle]
-    pub extern "C" fn wire_ble_stop_scan(port_: i64) {
-        wire_ble_stop_scan_impl(port_)
+    pub extern "C" fn wire_connect(port_: i64, id: *mut wire_uint_8_list) {
+        wire_connect_impl(port_, id)
     }
 
     #[no_mangle]

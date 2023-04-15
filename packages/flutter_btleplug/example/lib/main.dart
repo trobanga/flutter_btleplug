@@ -12,24 +12,19 @@ final streamProvider = StreamProvider.autoDispose<String>((ref) async* {
   }
 });
 
-class ScanNotifier extends StateNotifier<List<String>> {
+class ScanNotifier extends StateNotifier<List<BleDevice>> {
   ScanNotifier() : super([]);
 
-  void add(String s) {
-    state = [...state, s];
-  }
-
   void start() {
-    final scan = btl.bleScan(filter: []);
+    final scan = btl.scan(filter: []);
     scan.listen((s) {
-      log.i(s.id);
-      add(s.id);
+        state = s;
     });
   }
 }
 
 final scanProvider =
-    StateNotifierProvider<ScanNotifier, List<String>>((ref) => ScanNotifier());
+    StateNotifierProvider<ScanNotifier, List<BleDevice>>((ref) => ScanNotifier());
 
 class Log extends ConsumerWidget {
   const Log({super.key});
@@ -74,7 +69,7 @@ class MyApp extends ConsumerWidget {
             const Log(),
             ListView(
               shrinkWrap: true,
-              children: [for (final s in scans) Text(s)],
+              children: [for (final s in scans) ElevatedButton(onPressed: () {btl.connect(s.id)}, child: Text(s.name))],
             ),
           ])),
     );

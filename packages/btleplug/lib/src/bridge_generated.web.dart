@@ -48,10 +48,10 @@ class BtleplugWasmModule implements WasmModule {
   external BtleplugWasmModule bind(dynamic thisArg, String moduleName);
   external dynamic /* void */ wire_init(NativePortType port_);
 
-  external dynamic /* void */ wire_ble_scan(
+  external dynamic /* void */ wire_scan(
       NativePortType port_, List<String> filter);
 
-  external dynamic /* void */ wire_ble_stop_scan(NativePortType port_);
+  external dynamic /* void */ wire_connect(NativePortType port_, String id);
 
   external dynamic /* void */ wire_create_log_stream(NativePortType port_);
 }
@@ -64,11 +64,11 @@ class BtleplugWire extends FlutterRustBridgeWasmWireBase<BtleplugWasmModule> {
 
   void wire_init(NativePortType port_) => wasmModule.wire_init(port_);
 
-  void wire_ble_scan(NativePortType port_, List<String> filter) =>
-      wasmModule.wire_ble_scan(port_, filter);
+  void wire_scan(NativePortType port_, List<String> filter) =>
+      wasmModule.wire_scan(port_, filter);
 
-  void wire_ble_stop_scan(NativePortType port_) =>
-      wasmModule.wire_ble_stop_scan(port_);
+  void wire_connect(NativePortType port_, String id) =>
+      wasmModule.wire_connect(port_, id);
 
   void wire_create_log_stream(NativePortType port_) =>
       wasmModule.wire_create_log_stream(port_);

@@ -14,6 +14,7 @@ struct _BleDevice {
 }
 
 /// Scan for Bluetooth Low Energy devices and send the results through the given sink.
+/// In Dart/Flutter one can listen() to bleScan(). The scan is automatically stopped when the subscription is cancelled.
 ///
 /// # Parameters
 ///
@@ -23,12 +24,20 @@ struct _BleDevice {
 /// # Return
 ///
 /// Returns a `Result<()>` indicating if the scan operation has successfully started.
-pub fn ble_scan(sink: StreamSink<BleDevice>, filter: Vec<String>) -> Result<()> {
+///
+/// # Dart/Flutter Example
+/// ```dart
+/// final scan = bleScan().await;
+/// scan.listen((devices) {
+/// ...
+/// })
+/// ```
+pub fn scan(sink: StreamSink<Vec<BleDevice>>, filter: Vec<String>) -> Result<()> {
     ble::scan(sink, filter)
 }
 
-pub fn ble_stop_scan() -> Result<()> {
-    ble::stop_scan()
+pub fn connect(id: String) -> Result<()> {
+    ble::connect(id)
 }
 
 #[frb(mirror(LogEntry))]

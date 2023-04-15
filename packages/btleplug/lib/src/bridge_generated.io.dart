@@ -67,50 +67,213 @@ class BtleplugWire implements FlutterRustBridgeWireBase {
           lookup)
       : _lookup = lookup;
 
-  dispatch_queue_t dispatch_queue_create(
-    ffi.Pointer<ffi.Char> label,
-    dispatch_queue_attr_t attr,
+  int JNI_OnLoad(
+    int vm,
+    ffi.Pointer<ffi.Void> res,
   ) {
-    return _dispatch_queue_create(
-      label,
-      attr,
+    return _JNI_OnLoad(
+      vm,
+      res,
     );
   }
 
-  late final _dispatch_queue_createPtr = _lookup<
+  late final _JNI_OnLoadPtr = _lookup<
+          ffi.NativeFunction<ffi.Int Function(ffi.Int, ffi.Pointer<ffi.Void>)>>(
+      'JNI_OnLoad');
+  late final _JNI_OnLoad =
+      _JNI_OnLoadPtr.asFunction<int Function(int, ffi.Pointer<ffi.Void>)>();
+
+  void store_dart_post_cobject(
+    DartPostCObjectFnType ptr,
+  ) {
+    return _store_dart_post_cobject(
+      ptr,
+    );
+  }
+
+  late final _store_dart_post_cobjectPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(DartPostCObjectFnType)>>(
+          'store_dart_post_cobject');
+  late final _store_dart_post_cobject = _store_dart_post_cobjectPtr
+      .asFunction<void Function(DartPostCObjectFnType)>();
+
+  Object get_dart_object(
+    int ptr,
+  ) {
+    return _get_dart_object(
+      ptr,
+    );
+  }
+
+  late final _get_dart_objectPtr =
+      _lookup<ffi.NativeFunction<ffi.Handle Function(ffi.UintPtr)>>(
+          'get_dart_object');
+  late final _get_dart_object =
+      _get_dart_objectPtr.asFunction<Object Function(int)>();
+
+  void drop_dart_object(
+    int ptr,
+  ) {
+    return _drop_dart_object(
+      ptr,
+    );
+  }
+
+  late final _drop_dart_objectPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.UintPtr)>>(
+          'drop_dart_object');
+  late final _drop_dart_object =
+      _drop_dart_objectPtr.asFunction<void Function(int)>();
+
+  int new_dart_opaque(
+    Object handle,
+  ) {
+    return _new_dart_opaque(
+      handle,
+    );
+  }
+
+  late final _new_dart_opaquePtr =
+      _lookup<ffi.NativeFunction<ffi.UintPtr Function(ffi.Handle)>>(
+          'new_dart_opaque');
+  late final _new_dart_opaque =
+      _new_dart_opaquePtr.asFunction<int Function(Object)>();
+
+  int init_frb_dart_api_dl(
+    ffi.Pointer<ffi.Void> obj,
+  ) {
+    return _init_frb_dart_api_dl(
+      obj,
+    );
+  }
+
+  late final _init_frb_dart_api_dlPtr =
+      _lookup<ffi.NativeFunction<ffi.IntPtr Function(ffi.Pointer<ffi.Void>)>>(
+          'init_frb_dart_api_dl');
+  late final _init_frb_dart_api_dl = _init_frb_dart_api_dlPtr
+      .asFunction<int Function(ffi.Pointer<ffi.Void>)>();
+
+  void wire_init(
+    int port_,
+  ) {
+    return _wire_init(
+      port_,
+    );
+  }
+
+  late final _wire_initPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_init');
+  late final _wire_init = _wire_initPtr.asFunction<void Function(int)>();
+
+  void wire_scan(
+    int port_,
+    ffi.Pointer<wire_StringList> filter,
+  ) {
+    return _wire_scan(
+      port_,
+      filter,
+    );
+  }
+
+  late final _wire_scanPtr = _lookup<
       ffi.NativeFunction<
-          dispatch_queue_t Function(ffi.Pointer<ffi.Char>,
-              dispatch_queue_attr_t)>>('dispatch_queue_create');
-  late final _dispatch_queue_create = _dispatch_queue_createPtr.asFunction<
-      dispatch_queue_t Function(
-          ffi.Pointer<ffi.Char>, dispatch_queue_attr_t)>();
+          ffi.Void Function(
+              ffi.Int64, ffi.Pointer<wire_StringList>)>>('wire_scan');
+  late final _wire_scan = _wire_scanPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_StringList>)>();
+
+  void wire_connect(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> id,
+  ) {
+    return _wire_connect(
+      port_,
+      id,
+    );
+  }
+
+  late final _wire_connectPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_connect');
+  late final _wire_connect = _wire_connectPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_create_log_stream(
+    int port_,
+  ) {
+    return _wire_create_log_stream(
+      port_,
+    );
+  }
+
+  late final _wire_create_log_streamPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_create_log_stream');
+  late final _wire_create_log_stream =
+      _wire_create_log_streamPtr.asFunction<void Function(int)>();
+
+  ffi.Pointer<wire_StringList> new_StringList_0(
+    int len,
+  ) {
+    return _new_StringList_0(
+      len,
+    );
+  }
+
+  late final _new_StringList_0Ptr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<wire_StringList> Function(ffi.Int32)>>(
+      'new_StringList_0');
+  late final _new_StringList_0 = _new_StringList_0Ptr
+      .asFunction<ffi.Pointer<wire_StringList> Function(int)>();
+
+  ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
+    int len,
+  ) {
+    return _new_uint_8_list_0(
+      len,
+    );
+  }
+
+  late final _new_uint_8_list_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_uint_8_list> Function(
+              ffi.Int32)>>('new_uint_8_list_0');
+  late final _new_uint_8_list_0 = _new_uint_8_list_0Ptr
+      .asFunction<ffi.Pointer<wire_uint_8_list> Function(int)>();
+
+  void free_WireSyncReturn(
+    WireSyncReturn ptr,
+  ) {
+    return _free_WireSyncReturn(
+      ptr,
+    );
+  }
+
+  late final _free_WireSyncReturnPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(WireSyncReturn)>>(
+          'free_WireSyncReturn');
+  late final _free_WireSyncReturn =
+      _free_WireSyncReturnPtr.asFunction<void Function(WireSyncReturn)>();
 }
 
 class _Dart_Handle extends ffi.Opaque {}
 
-class dispatch_object_s extends ffi.Opaque {}
+class wire_uint_8_list extends ffi.Struct {
+  external ffi.Pointer<ffi.Uint8> ptr;
 
-typedef dispatch_queue_t = ffi.Pointer<dispatch_object_s>;
-typedef dispatch_queue_attr_t = ffi.Pointer<dispatch_object_s>;
+  @ffi.Int32()
+  external int len;
+}
 
-const int PERIPHERALSTATE_CONNECTED = 2;
+class wire_StringList extends ffi.Struct {
+  external ffi.Pointer<ffi.Pointer<wire_uint_8_list>> ptr;
 
-const int CHARACTERISTICPROPERTY_BROADCAST = 1;
+  @ffi.Int32()
+  external int len;
+}
 
-const int CHARACTERISTICPROPERTY_READ = 2;
-
-const int CHARACTERISTICPROPERTY_WRITEWITHOUTRESPONSE = 4;
-
-const int CHARACTERISTICPROPERTY_WRITE = 8;
-
-const int CHARACTERISTICPROPERTY_NOTIFY = 16;
-
-const int CHARACTERISTICPROPERTY_INDICATE = 32;
-
-const int CHARACTERISTICPROPERTY_AUTHENTICATEDSIGNEDWRITES = 64;
-
-const int SERVICE_DATA_16_BIT_UUID = 22;
-
-const int SERVICE_DATA_32_BIT_UUID = 32;
-
-const int SERVICE_DATA_128_BIT_UUID = 33;
+typedef DartPostCObjectFnType = ffi.Pointer<
+    ffi.NativeFunction<
+        ffi.Bool Function(DartPort port_id, ffi.Pointer<ffi.Void> message)>>;
+typedef DartPort = ffi.Int64;
