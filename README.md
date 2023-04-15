@@ -24,7 +24,37 @@ Try correcting the name to the name of an existing method, or defining a method 
       callFfi: (port_) => _platform.inner.wire_init(port_)
 ```
 rebuild with `melos run build:android-dev-from-scratch`. 
-Repeat until it works  ¯\_ (ツ)_/¯ 
+Repeat until it works  ¯\\_ (ツ)_/¯ 
 
 ### Contributors
 The package is in early development, if you want to help open an issue and we'll figure it out.
+
+### Platform Feature Table
+
+- X: Completed and released
+- O: In development
+- Blank: Not started
+
+| Feature                               | Windows | MacOS / iOS | Linux | Android |
+|---------------------------------------|---------|-------------|-------|---------|
+| Bring Up Adapter                      |         |             |       | X       |
+| Handle Multiple Adapters              |         |             |       |         |
+| Discover Devices                      |         |             |       | X       |
+| └ Discover Services                   |         |             |       |         |
+| └ Discover Characteristics            |         |             |       |         |
+| └ Discover Descriptors                |         |             |       |         |
+| └ Discover Name                       |         |             |       |         |
+| └ Discover Manufacturer Data          |         |             |       |         |
+| └ Discover Service Data               |         |             |       |         |
+| └ Discover MAC address                |         |             |       |         |
+| GATT Server Connect                   |         |             |       | X       |
+| GATT Server Connect Event             |         |             |       | X       |
+| GATT Server Disconnect                |         |             |       | X       |
+| GATT Server Disconnect Event          |         |             |       | X       |
+| Write to Characteristic               |         |             |       |         |
+| Read from Characteristic              |         |             |       |         |
+| Subscribe to Characteristic           |         |             |       |         |
+| Unsubscribe from Characteristic       |         |             |       |         |
+| Get Characteristic Notification Event |         |             |       |         |
+| Read Descriptor                       |         |             |       |         |
+| Write Descriptor                      |         |             |       |         |
