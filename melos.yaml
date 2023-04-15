@@ -38,6 +38,10 @@ scripts:
     run: bash scripts/build-android-dev.sh
     description: Build the .tar.gz for Android.
 
+  build:android-dev-from-scratch:
+    run: melos run clean && melos bs && bash scripts/build-android-dev.sh
+    description: Build the .tar.gz for Android.
+
   build:linux:
     run: bash scripts/build-linux.sh
     description: Build the .tar.gz for Linux.
