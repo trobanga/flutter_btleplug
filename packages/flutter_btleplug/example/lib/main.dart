@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:logger/logger.dart';
 import 'package:flutter_btleplug/flutter_btleplug.dart';
@@ -61,8 +62,9 @@ class MyApp extends ConsumerWidget {
           ),
           body: Column(children: [
             ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   log.i('scanning...');
+                  await Permission.bluetoothScan.request();
                   ref.read(scanProvider.notifier).start();
                 },
                 child: const Text('scan')),

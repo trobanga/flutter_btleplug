@@ -32,4 +32,5 @@ cd ..
 
 export CURR_VERSION=btleplug-v`awk '/^version: /{print $2}' packages/btleplug/pubspec.yaml`
 cp platform-build/android.tar.gz packages/flutter_btleplug/android/$CURR_VERSION.tar.gz
+mkdir -p "packages/flutter_btleplug/android/src/main/jniLibs"
 tar xzf platform-build/android.tar.gz -C packages/flutter_btleplug/android/src/main/jniLibs
