@@ -5,7 +5,7 @@ repository: https://github.com/trobanga/flutter_btleplug
 issue_tracker: https://github.com/trobanga/flutter_btleplug/issues
 
 environment:
-  sdk: '>=2.19.2 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
   flutter: ">=2.11.0"
 
 dependencies:
@@ -15,7 +15,7 @@ dependencies:
 
 dev_dependencies:
   ffi: ^2.0.1
-  ffigen: ^7.2.6
+  ffigen: ^8.0.2
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0

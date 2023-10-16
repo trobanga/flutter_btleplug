@@ -5,13 +5,13 @@ repository: https://github.com/trobanga/flutter_btleplug
 issue_tracker: https://github.com/trobanga/flutter_btleplug/issues
 
 environment:
-  sdk: '>=2.19.2 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 # dependencies:
 #   path: ^1.8.0
 
 dev_dependencies:
-  ffigen: ^7.2.6
+  ffigen: ^8.0.2
   lints: ^2.0.0
   test: ^1.21.0
 dependencies:
