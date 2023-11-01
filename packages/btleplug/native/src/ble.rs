@@ -9,6 +9,7 @@ use flutter_rust_bridge::StreamSink;
 use futures::stream::StreamExt;
 use once_cell::sync::{Lazy, OnceCell};
 use tokio::sync::{mpsc, Mutex};
+use uuid::Uuid;
 
 mod setup;
 pub use setup::*;
@@ -193,7 +194,14 @@ async fn inner_scan(sink: StreamSink<Vec<BleDevice>>, _filter: Vec<String>) -> R
         "start scanning on {}",
         central.adapter_info().await?
     ));
-    central.start_scan(ScanFilter::default()).await?;
+    central
+        .start_scan(ScanFilter {
+            services: _filter
+                .iter()
+                .map(|s| Uuid::parse_str(s).unwrap())
+                .collect(),
+        })
+        .await?;
 
     let mut device_send_interval = time::interval(time::Duration::from_secs(1));
     loop {
