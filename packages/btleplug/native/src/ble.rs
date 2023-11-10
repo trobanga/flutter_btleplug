@@ -1,14 +1,14 @@
 use std::collections::HashMap;
+use std::fmt::Display;
 
 use anyhow::Result;
-use btleplug::api::{
-    bleuuid::BleUuid, Central, CentralEvent, Manager as _, Peripheral as _, ScanFilter,
-};
-use btleplug::platform::{Manager, PeripheralId};
+use btleplug::api::bleuuid::BleUuid;
+use btleplug::api::{Central, CentralEvent, Manager as _, Peripheral as _, ScanFilter};
+use btleplug::platform::{Adapter, Manager, PeripheralId};
 use flutter_rust_bridge::StreamSink;
 use futures::stream::StreamExt;
 use once_cell::sync::{Lazy, OnceCell};
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{self, mpsc, Mutex};
 use uuid::Uuid;
 
 mod setup;
@@ -23,6 +23,9 @@ enum Command {
     Scan {
         sink: StreamSink<Vec<BleDevice>>,
         filter: Vec<String>,
+    },
+    Event {
+        sink: StreamSink<BleEvent>,
     },
     Connect {
         id: String,
@@ -109,6 +112,9 @@ pub fn init() -> Result<()> {
                 Command::Scan { sink, filter } => {
                     tokio::spawn(async { inner_scan(sink, filter).await.unwrap() });
                 }
+                Command::Event { sink } => {
+                    tokio::spawn(async { inner_events(sink).await.unwrap() });
+                }
                 Command::Connect { id } => inner_connect(id).await.unwrap(),
                 Command::Disconnect { id } => inner_disconnect(id).await.unwrap(),
             }
@@ -152,6 +158,89 @@ impl BleDevice {
     }
 }
 
+static CENTRAL: sync::OnceCell<Adapter> = sync::OnceCell::const_new();
+
+async fn init_adapter() -> Adapter {
+    let manager = Manager::new().await.expect("Init manager failed!");
+    let adapters = manager.adapters().await.expect("Get adapters failed!");
+    adapters.into_iter().next().expect("cannot fail")
+}
+
+pub struct MapData {
+    pub key: String,
+    pub data: Vec<u8>,
+}
+
+impl MapData {
+    fn from_data<T: Display>(data: HashMap<T, Vec<u8>>) -> Vec<Self> {
+        data.into_iter()
+            .map(|(k, v)| MapData {
+                key: k.to_string(),
+                data: v,
+            })
+            .collect()
+    }
+}
+
+pub enum BleEvent {
+    DeviceDiscovered {
+        id: String,
+    },
+    DeviceUpdated {
+        id: String,
+    },
+    DeviceConnected {
+        id: String,
+    },
+    DeviceDisconnected {
+        id: String,
+    },
+    ManufacturerDataAdvertisement {
+        id: String,
+        manufacturer_data: Vec<MapData>,
+    },
+    ServiceDataAdvertisement {
+        id: String,
+        service_data: Vec<MapData>,
+    },
+    ServicesAdvertisement {
+        id: String,
+        services: Vec<String>,
+    },
+}
+
+impl BleEvent {
+    fn from_central_event(event: CentralEvent) -> Self {
+        match event {
+            CentralEvent::DeviceDiscovered(id) => BleEvent::DeviceDiscovered { id: id.to_string() },
+            CentralEvent::DeviceUpdated(id) => BleEvent::DeviceUpdated { id: id.to_string() },
+            CentralEvent::DeviceConnected(id) => BleEvent::DeviceConnected { id: id.to_string() },
+            CentralEvent::DeviceDisconnected(id) => {
+                BleEvent::DeviceDisconnected { id: id.to_string() }
+            }
+            CentralEvent::ManufacturerDataAdvertisement {
+                id,
+                manufacturer_data,
+            } => BleEvent::ManufacturerDataAdvertisement {
+                id: id.to_string(),
+                manufacturer_data: MapData::from_data(manufacturer_data),
+            },
+            CentralEvent::ServiceDataAdvertisement { id, service_data } => {
+                BleEvent::ServiceDataAdvertisement {
+                    id: id.to_string(),
+                    service_data: MapData::from_data(service_data),
+                }
+            }
+            CentralEvent::ServicesAdvertisement { id, services } => {
+                BleEvent::ServicesAdvertisement {
+                    id: id.to_string(),
+                    services: services.iter().map(|id| id.to_string()).collect(),
+                }
+            }
+        }
+    }
+}
+
 /// Helper function to send all [BleDevice]s to Dart/Flutter.
 ///
 /// # Arguments
@@ -183,10 +272,12 @@ pub fn scan(sink: StreamSink<Vec<BleDevice>>, filter: Vec<String>) -> Result<()>
     send(Command::Scan { sink, filter })
 }
 
+pub fn events(sink: StreamSink<BleEvent>) -> Result<()> {
+    send(Command::Event { sink: sink })
+}
+
 async fn inner_scan(sink: StreamSink<Vec<BleDevice>>, _filter: Vec<String>) -> Result<()> {
-    let manager = Manager::new().await?;
-    let adapters = manager.adapters().await?;
-    let central = adapters.into_iter().next().expect("cannot fail");
+    let central = CENTRAL.get_or_init(init_adapter).await;
     let mut events = central.events().await?;
 
     // start scanning for devices
@@ -266,7 +357,21 @@ async fn inner_scan(sink: StreamSink<Vec<BleDevice>>, _filter: Vec<String>) -> R
             }
         }
     }
+    central.stop_scan().await?;
     log("Scan finished");
+    Ok(())
+}
+
+async fn inner_events(sink: StreamSink<BleEvent>) -> Result<()> {
+    let central = CENTRAL.get_or_init(init_adapter).await;
+    let mut events = central.events().await?;
+    loop {
+        if let Some(event) = events.next().await {
+            if !sink.add(BleEvent::from_central_event(event)) {
+                break;
+            }
+        }
+    }
     Ok(())
 }
 
