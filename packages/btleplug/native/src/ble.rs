@@ -276,7 +276,7 @@ pub fn events(sink: StreamSink<BleEvent>) -> Result<()> {
     send(Command::Event { sink: sink })
 }
 
-async fn inner_scan(sink: StreamSink<Vec<BleDevice>>, _filter: Vec<String>) -> Result<()> {
+async fn inner_scan(sink: StreamSink<Vec<BleDevice>>, filter: Vec<String>) -> Result<()> {
     let central = CENTRAL.get_or_init(init_adapter).await;
     let mut events = central.events().await?;
 
@@ -287,7 +287,7 @@ async fn inner_scan(sink: StreamSink<Vec<BleDevice>>, _filter: Vec<String>) -> R
     ));
     central
         .start_scan(ScanFilter {
-            services: _filter
+            services: filter
                 .iter()
                 .map(|s| Uuid::parse_str(s).unwrap())
                 .collect(),
