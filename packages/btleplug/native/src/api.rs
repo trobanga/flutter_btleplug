@@ -1,16 +1,10 @@
-use crate::ble::{self, BleDevice};
+use crate::ble::{self, event::BleEvent, scan::BleDevice};
 use crate::logger::{self, LogEntry};
 use anyhow::Result;
-use flutter_rust_bridge::{frb, StreamSink};
+use flutter_rust_bridge::StreamSink;
 
 pub fn init() -> Result<()> {
     ble::init()
-}
-
-#[frb(mirror(BleDevice))]
-struct _BleDevice {
-    id: String,
-    name: String,
 }
 
 /// Scan for Bluetooth Low Energy devices and send the results through the given sink.
@@ -33,7 +27,11 @@ struct _BleDevice {
 /// })
 /// ```
 pub fn scan(sink: StreamSink<Vec<BleDevice>>, filter: Vec<String>) -> Result<()> {
-    ble::scan(sink, filter)
+    ble::scan::scan(sink, filter)
+}
+
+pub fn events(sink: StreamSink<BleEvent>) -> Result<()> {
+    ble::event::events(sink)
 }
 
 pub fn connect(id: String) -> Result<()> {
@@ -42,12 +40,6 @@ pub fn connect(id: String) -> Result<()> {
 
 pub fn disconnect(id: String) -> Result<()> {
     ble::disconnect(id)
-}
-
-#[frb(mirror(LogEntry))]
-struct _LogEntry {
-    time_millis: u64,
-    msg: String,
 }
 
 pub fn create_log_stream(s: StreamSink<LogEntry>) {

@@ -37,6 +37,8 @@ void wire_init(int64_t port_);
 
 void wire_scan(int64_t port_, struct wire_StringList *filter);
 
+void wire_events(int64_t port_);
+
 void wire_connect(int64_t port_, struct wire_uint_8_list *id);
 
 void wire_disconnect(int64_t port_, struct wire_uint_8_list *id);
@@ -53,6 +55,7 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     int64_t dummy_var = 0;
     dummy_var ^= ((int64_t) (void*) wire_init);
     dummy_var ^= ((int64_t) (void*) wire_scan);
+    dummy_var ^= ((int64_t) (void*) wire_events);
     dummy_var ^= ((int64_t) (void*) wire_connect);
     dummy_var ^= ((int64_t) (void*) wire_disconnect);
     dummy_var ^= ((int64_t) (void*) wire_create_log_stream);
