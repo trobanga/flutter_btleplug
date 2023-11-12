@@ -1,4 +1,4 @@
-use crate::ble::{self, BleDevice, BleEvent};
+use crate::ble::{self, event::BleEvent, scan::BleDevice};
 use crate::logger::{self, LogEntry};
 use anyhow::Result;
 use flutter_rust_bridge::StreamSink;
@@ -27,11 +27,11 @@ pub fn init() -> Result<()> {
 /// })
 /// ```
 pub fn scan(sink: StreamSink<Vec<BleDevice>>, filter: Vec<String>) -> Result<()> {
-    ble::scan(sink, filter)
+    ble::scan::scan(sink, filter)
 }
 
 pub fn events(sink: StreamSink<BleEvent>) -> Result<()> {
-    ble::events(sink)
+    ble::event::events(sink)
 }
 
 pub fn connect(id: String) -> Result<()> {

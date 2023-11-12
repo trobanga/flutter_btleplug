@@ -20,9 +20,9 @@ use std::sync::Arc;
 
 // Section: imports
 
-use crate::ble::BleDevice;
-use crate::ble::BleEvent;
-use crate::ble::MapData;
+use crate::ble::event::BleEvent;
+use crate::ble::event::MapData;
+use crate::ble::scan::BleDevice;
 use crate::logger::LogEntry;
 
 // Section: wire functions
