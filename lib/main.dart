@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_btleplug/src/rust/api/ble.dart';
+import 'package:flutter_btleplug/src/rust/api/ble/device.dart';
 import 'package:flutter_btleplug/src/rust/api/logger.dart';
 import 'package:flutter_btleplug/src/rust/frb_generated.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,12 +8,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
 final log = Logger(level: Level.debug);
-
-final streamProvider = StreamProvider.autoDispose<String>((ref) async* {
-  await for (final s in enableLogging()) {
-    log.i(s);
-  }
-});
 
 class ScanNotifier extends StateNotifier<List<BleDevice>> {
   ScanNotifier() : super([]);
@@ -28,25 +23,9 @@ class ScanNotifier extends StateNotifier<List<BleDevice>> {
 final scanProvider = StateNotifierProvider<ScanNotifier, List<BleDevice>>(
     (ref) => ScanNotifier());
 
-class Log extends ConsumerWidget {
-  const Log({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<String> message = ref.watch(streamProvider);
-
-    return message.when(
-      loading: () => const CircularProgressIndicator(),
-      error: (err, stack) => Text('Error: $err'),
-      data: (message) {
-        return Text(message);
-      },
-    );
-  }
-}
-
 void main() async {
   await RustLib.init();
+  enableLogging().listen((msg) => log.i(msg));
   init();
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -69,7 +48,6 @@ class MyApp extends ConsumerWidget {
                   ref.read(scanProvider.notifier).start();
                 },
                 child: const Text('scan')),
-            const Log(),
             ListView(
               shrinkWrap: true,
               children: [

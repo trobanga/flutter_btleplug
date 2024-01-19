@@ -1,6 +1,5 @@
 use lib_flutter_rust_bridge_codegen::codegen::{Config, MetaConfig};
 use std::{env, io};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 const RUST_INPUT: &str = "src/api/**/*.rs";
 const DART_OUTPUT: &str = "../lib/src/rust";
@@ -12,14 +11,6 @@ fn main() {
     // Tell Cargo that if the input Rust code changes, rerun this build script
     println!("cargo:rerun-if-changed=src/api/**/*.rs");
     println!("cargo:rerun-if-changed=src/api.rs");
-
-    if env::var("RUST_LOG").is_err() {
-        env::set_var("RUST_LOG", "debug")
-    }
-    tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::from_default_env())
-        .with(tracing_subscriber::fmt::layer().with_writer(io::stdout))
-        .init();
 
     let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap();
     let (c_output, duplicated_c_output) = if target_os == "macos" || target_os == "ios" {

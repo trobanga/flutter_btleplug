@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'ble/device.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 /// The init() function must be called before anything else.
@@ -25,25 +26,3 @@ Future<void> connect({required String id, dynamic hint}) =>
 
 Future<void> disconnect({required String id, dynamic hint}) =>
     RustLib.instance.api.disconnect(id: id, hint: hint);
-
-/// This is the BleDevice intended to show in Dart/Flutter
-class BleDevice {
-  final String id;
-  final String name;
-
-  const BleDevice({
-    required this.id,
-    required this.name,
-  });
-
-  @override
-  int get hashCode => id.hashCode ^ name.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BleDevice &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          name == other.name;
-}

@@ -22,5 +22,3 @@ tracing-subscriber = "0.3.18"
 
 [build-dependencies]
 flutter_rust_bridge_codegen = "=2.0.0-dev.20"
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"]}

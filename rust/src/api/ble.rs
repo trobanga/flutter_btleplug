@@ -2,10 +2,8 @@ use std::collections::HashMap;
 use std::sync::{Arc, OnceLock};
 
 use anyhow::Result;
-use btleplug::api::{
-    bleuuid::BleUuid, Central, CentralEvent, Manager as _, Peripheral as _, ScanFilter,
-};
-use btleplug::platform::{Manager, PeripheralId};
+use btleplug::api::{bleuuid::BleUuid, Central, CentralEvent, Manager as _, ScanFilter};
+pub use btleplug::platform::Manager;
 use futures::stream::StreamExt;
 use tokio::{
     sync::{mpsc, Mutex},
@@ -15,7 +13,13 @@ use tokio::{
 pub mod setup;
 pub use setup::*;
 
+pub mod device;
+pub mod peripheral;
+
 use crate::frb_generated::StreamSink;
+
+pub use device::*;
+pub use peripheral::*;
 
 enum Command {
     Scan {
@@ -33,51 +37,6 @@ enum Command {
 impl std::fmt::Debug for Command {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Scan").finish()
-    }
-}
-
-/// Wrapper struct around btleplug::platform::Peripheral that adds the last_seen variable.
-///
-#[derive(Debug, Clone)]
-struct Peripheral {
-    peripheral: btleplug::platform::Peripheral,
-    last_seen: time::Instant,
-    is_connected: bool,
-}
-
-impl Peripheral {
-    fn new(peripheral: btleplug::platform::Peripheral) -> Self {
-        Self {
-            peripheral,
-            last_seen: time::Instant::now(),
-            is_connected: false,
-        }
-    }
-
-    fn id(&self) -> PeripheralId {
-        self.peripheral.id()
-    }
-
-    async fn name(&self) -> Option<String> {
-        if let Ok(Some(properties)) = self.peripheral.properties().await {
-            properties.local_name
-        } else {
-            None
-        }
-    }
-
-    async fn connect(&self) -> Result<()> {
-        self.peripheral.connect().await?;
-        Ok(())
-    }
-
-    async fn disconnect(&self) -> Result<()> {
-        self.peripheral.disconnect().await?;
-        Ok(())
-    }
-
-    fn is_connected(&self) -> bool {
-        self.is_connected
     }
 }
 
@@ -136,22 +95,6 @@ pub fn init() -> Result<()> {
 async fn remove_stale_devices(timeout: u64) {
     let mut devices = DEVICES.get().unwrap().lock().await;
     devices.retain(|_, d| d.is_connected() || d.last_seen.elapsed().as_secs() < timeout);
-}
-
-/// This is the BleDevice intended to show in Dart/Flutter
-#[derive(Debug, Clone)]
-pub struct BleDevice {
-    pub id: String,
-    pub name: String,
-}
-
-impl BleDevice {
-    async fn from_peripheral(peripheral: &Peripheral) -> Self {
-        Self {
-            id: peripheral.id().to_string(),
-            name: peripheral.name().await.unwrap_or_default(),
-        }
-    }
 }
 
 /// Helper function to send all [BleDevice]s to Dart/Flutter.

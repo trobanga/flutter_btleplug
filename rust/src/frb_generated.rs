@@ -19,7 +19,7 @@
 
 // Section: imports
 
-use crate::api::ble::peripheral::*;
+use crate::api::ble::device::*;
 use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
 use flutter_rust_bridge::for_generated::transform_result_dco;
 use flutter_rust_bridge::{Handler, IntoIntoDart};
@@ -151,11 +151,55 @@ fn wire_scan_impl(
                         StreamSink::new(
                             context
                                 .rust2dart_context()
-                                .stream_sink::<_, Vec<crate::api::ble::BleDevice>>(),
+                                .stream_sink::<_, Vec<crate::api::ble::device::BleDevice>>(),
                         ),
                         api_filter,
                     )
                 })())
+            }
+        },
+    )
+}
+fn wire_BleDevice_from_peripheral_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "BleDevice_from_peripheral",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_peripheral = <RustOpaqueMoi<
+                flutter_rust_bridge::for_generated::rust_async::RwLock<
+                    crate::api::ble::peripheral::Peripheral,
+                >,
+            >>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse(
+                    (move || async move {
+                        let api_peripheral =
+                            api_peripheral.rust_auto_opaque_decode_async_ref().await;
+                        Result::<_, flutter_rust_bridge::for_generated::anyhow::Error>::Ok(
+                            crate::api::ble::device::BleDevice::from_peripheral(&api_peripheral)
+                                .await,
+                        )
+                    })()
+                    .await,
+                )
             }
         },
     )
@@ -183,14 +227,16 @@ fn wire_Peripheral_connect_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::Peripheral>,
+                flutter_rust_bridge::for_generated::rust_async::RwLock<
+                    crate::api::ble::peripheral::Peripheral,
+                >,
             >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse(
                     (move || async move {
                         let api_that = api_that.rust_auto_opaque_decode_async_ref().await;
-                        crate::api::ble::Peripheral::connect(&api_that).await
+                        crate::api::ble::peripheral::Peripheral::connect(&api_that).await
                     })()
                     .await,
                 )
@@ -221,56 +267,19 @@ fn wire_Peripheral_disconnect_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::Peripheral>,
+                flutter_rust_bridge::for_generated::rust_async::RwLock<
+                    crate::api::ble::peripheral::Peripheral,
+                >,
             >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse(
                     (move || async move {
                         let api_that = api_that.rust_auto_opaque_decode_async_ref().await;
-                        crate::api::ble::Peripheral::disconnect(&api_that).await
+                        crate::api::ble::peripheral::Peripheral::disconnect(&api_that).await
                     })()
                     .await,
                 )
-            }
-        },
-    )
-}
-fn wire_Peripheral_id_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Peripheral_id",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::Peripheral>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse((move || {
-                    let api_that = api_that.rust_auto_opaque_decode_sync_ref();
-                    Result::<_, flutter_rust_bridge::for_generated::anyhow::Error>::Ok(
-                        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(
-                            crate::api::ble::Peripheral::id(&api_that),
-                        ),
-                    )
-                })())
             }
         },
     )
@@ -298,14 +307,16 @@ fn wire_Peripheral_is_connected_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::Peripheral>,
+                flutter_rust_bridge::for_generated::rust_async::RwLock<
+                    crate::api::ble::peripheral::Peripheral,
+                >,
             >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse((move || {
                     let api_that = api_that.rust_auto_opaque_decode_sync_ref();
                     Result::<_, flutter_rust_bridge::for_generated::anyhow::Error>::Ok(
-                        crate::api::ble::Peripheral::is_connected(&api_that),
+                        crate::api::ble::peripheral::Peripheral::is_connected(&api_that),
                     )
                 })())
             }
@@ -335,7 +346,9 @@ fn wire_Peripheral_name_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::Peripheral>,
+                flutter_rust_bridge::for_generated::rust_async::RwLock<
+                    crate::api::ble::peripheral::Peripheral,
+                >,
             >>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -343,50 +356,11 @@ fn wire_Peripheral_name_impl(
                     (move || async move {
                         let api_that = api_that.rust_auto_opaque_decode_async_ref().await;
                         Result::<_, flutter_rust_bridge::for_generated::anyhow::Error>::Ok(
-                            crate::api::ble::Peripheral::name(&api_that).await,
+                            crate::api::ble::peripheral::Peripheral::name(&api_that).await,
                         )
                     })()
                     .await,
                 )
-            }
-        },
-    )
-}
-fn wire_Peripheral_new_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "Peripheral_new",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_peripheral = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::Peripheral>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| {
-                transform_result_sse((move || {
-                    let api_peripheral = api_peripheral.rust_auto_opaque_decode_sync_owned();
-                    Result::<_, flutter_rust_bridge::for_generated::anyhow::Error>::Ok(
-                        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(
-                            crate::api::ble::Peripheral::new(api_peripheral),
-                        ),
-                    )
-                })())
             }
         },
     )
@@ -476,10 +450,7 @@ fn wire_enable_logging_impl(
 // Section: related_funcs
 
 flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::rust_async::RwLock<PeripheralId>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::Peripheral>
+    flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::peripheral::Peripheral>
 );
 
 // Section: dart2rust
@@ -492,18 +463,10 @@ impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
 }
 
 impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::rust_async::RwLock<PeripheralId>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
-impl SseDecode
     for RustOpaqueMoi<
-        flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::Peripheral>,
+        flutter_rust_bridge::for_generated::rust_async::RwLock<
+            crate::api::ble::peripheral::Peripheral,
+        >,
     >
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -521,12 +484,12 @@ impl SseDecode for String {
     }
 }
 
-impl SseDecode for crate::api::ble::BleDevice {
+impl SseDecode for crate::api::ble::device::BleDevice {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_id = <String>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
-        return crate::api::ble::BleDevice {
+        return crate::api::ble::device::BleDevice {
             id: var_id,
             name: var_name,
         };
@@ -559,13 +522,15 @@ impl SseDecode for Vec<String> {
     }
 }
 
-impl SseDecode for Vec<crate::api::ble::BleDevice> {
+impl SseDecode for Vec<crate::api::ble::device::BleDevice> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(<crate::api::ble::BleDevice>::sse_decode(deserializer));
+            ans_.push(<crate::api::ble::device::BleDevice>::sse_decode(
+                deserializer,
+            ));
         }
         return ans_;
     }
@@ -633,19 +598,18 @@ fn pde_ffi_dispatcher_primary_impl(
     data_len: i32,
 ) {
     match func_id {
-        13 => wire_connect_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire_disconnect_impl(port, ptr, rust_vec_len, data_len),
-        11 => wire_init_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire_scan_impl(port, ptr, rust_vec_len, data_len),
-        4 => wire_Peripheral_connect_impl(port, ptr, rust_vec_len, data_len),
-        5 => wire_Peripheral_disconnect_impl(port, ptr, rust_vec_len, data_len),
-        2 => wire_Peripheral_id_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire_Peripheral_is_connected_impl(port, ptr, rust_vec_len, data_len),
-        3 => wire_Peripheral_name_impl(port, ptr, rust_vec_len, data_len),
-        1 => wire_Peripheral_new_impl(port, ptr, rust_vec_len, data_len),
-        10 => wire_create_runtime_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire_add_logger_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire_enable_logging_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire_connect_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire_disconnect_impl(port, ptr, rust_vec_len, data_len),
+        12 => wire_init_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire_scan_impl(port, ptr, rust_vec_len, data_len),
+        1 => wire_BleDevice_from_peripheral_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire_Peripheral_connect_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire_Peripheral_disconnect_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire_Peripheral_is_connected_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire_Peripheral_name_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire_create_runtime_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire_add_logger_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire_enable_logging_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -664,7 +628,7 @@ fn pde_ffi_dispatcher_sync_impl(
 // Section: rust2dart
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::ble::BleDevice {
+impl flutter_rust_bridge::IntoDart for crate::api::ble::device::BleDevice {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.id.into_into_dart().into_dart(),
@@ -673,9 +637,14 @@ impl flutter_rust_bridge::IntoDart for crate::api::ble::BleDevice {
         .into_dart()
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::ble::BleDevice {}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::ble::BleDevice> for crate::api::ble::BleDevice {
-    fn into_into_dart(self) -> crate::api::ble::BleDevice {
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::ble::device::BleDevice
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::ble::device::BleDevice>
+    for crate::api::ble::device::BleDevice
+{
+    fn into_into_dart(self) -> crate::api::ble::device::BleDevice {
         self
     }
 }
@@ -705,19 +674,10 @@ impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
 }
 
 impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::rust_async::RwLock<PeripheralId>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
-impl SseEncode
     for RustOpaqueMoi<
-        flutter_rust_bridge::for_generated::rust_async::RwLock<crate::api::ble::Peripheral>,
+        flutter_rust_bridge::for_generated::rust_async::RwLock<
+            crate::api::ble::peripheral::Peripheral,
+        >,
     >
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -735,7 +695,7 @@ impl SseEncode for String {
     }
 }
 
-impl SseEncode for crate::api::ble::BleDevice {
+impl SseEncode for crate::api::ble::device::BleDevice {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.id, serializer);
@@ -767,12 +727,12 @@ impl SseEncode for Vec<String> {
     }
 }
 
-impl SseEncode for Vec<crate::api::ble::BleDevice> {
+impl SseEncode for Vec<crate::api::ble::device::BleDevice> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::api::ble::BleDevice>::sse_encode(item, serializer);
+            <crate::api::ble::device::BleDevice>::sse_encode(item, serializer);
         }
     }
 }
