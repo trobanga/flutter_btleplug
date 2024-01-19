@@ -1,0 +1,26 @@
+[package]
+name = "rust_lib"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+anyhow = "1.0.79"
+btleplug = "0.10.5"
+flutter_rust_bridge = "2.0.0-dev.20"
+futures = "0.3.30"
+jni = "0.19.0"
+jni-utils = "0.1.1"
+thiserror = "1.0.56"
+tokio = { version = "1.35.1", features = ["macros", "rt", "sync", "rt-multi-thread", "time"] }
+tokio-stream = { version = "0.1.14", features = ["sync"] }
+tracing = "0.1.40"
+tracing-core = "0.1.32"
+tracing-subscriber = "0.3.18"
+
+[build-dependencies]
+flutter_rust_bridge_codegen = "=2.0.0-dev.20"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"]}
