@@ -2,7 +2,7 @@
 
 A cross-platform Flutter Bluetooth plugin, based on [btleplug](https://github.com/deviceplug/btleplug).
 
-**This is a work in progress, do not use in production (yet)**
+Check frb2 branch for a version that works with flutter_rust_bridge v2.
 
 ## Setup
 The project uses [Melos](https://melos.invertase.dev/) to build the package.
